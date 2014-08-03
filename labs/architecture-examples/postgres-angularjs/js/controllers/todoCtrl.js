@@ -6,10 +6,19 @@
  * - exposes the model to the template and provides event handlers
  */
 angular.module('todomvc')
-	.controller('TodoCtrl', function TodoCtrl($scope, $routeParams, $filter, todoStorage) {
+	.controller('TodoCtrl', function TodoCtrl($scope, $routeParams, $filter, todoPostgresStorage) {
 		'use strict';
 
-		var todos = $scope.todos = todoStorage.get();
+		var todos = $scope.todos = [];	// Intialize with empty array, until database service poplates the list
+
+		todoPostgresStorage.get(function(err, data) {
+			if (err) {
+				todos = $scope.todos = [{title: 'Error: Could not fetch data from database!'}];
+				return;
+			}
+
+			todos = $scope.todos = data;
+		});
 
 		$scope.newTodo = '';
 		$scope.editedTodo = null;
